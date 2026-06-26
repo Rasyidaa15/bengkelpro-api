@@ -11,6 +11,8 @@ const Product = sequelize.define('Product', {
   categoryId: { type: DataTypes.INTEGER, allowNull: false },
   supplierId: { type: DataTypes.INTEGER, allowNull: false },
 }, {
+  tableName: 'products',   // 🔥 INI WAJIB
+  freezeTableName: true,   // 🔥 BIAR GA DIUBAH SEQUELIZE
   timestamps: false
 });
 
