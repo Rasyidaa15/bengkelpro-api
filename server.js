@@ -3,29 +3,34 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 
-// Load .env
+// Load env
 dotenv.config();
 
-// IMPORT DARI MODELS
+// DB
 const { sequelize } = require('./models');
 
 const app = express();
 
 // ======================
-// MIDDLEWARE
+// CORS CONFIG
 // ======================
-app.use(cors({
-  origin: process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(',')
-    : ['http://localhost:3000'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL
+      ? process.env.FRONTEND_URL.split(',')
+      : '*', // sementara biar aman dulu di deploy
+    credentials: true,
+  })
+);
 
+// ======================
+// BODY PARSER
+// ======================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ======================
-// STATIC FILES
+// STATIC FILES (UPLOADS)
 // ======================
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -48,7 +53,7 @@ app.use('/api/upload', require('./routes/uploadRoutes'));
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: '🚀 BengkelPro API Running'
+    message: '🚀 BengkelPro API Running',
   });
 });
 
@@ -70,17 +75,12 @@ const PORT = process.env.PORT || 5000;
 
 (async () => {
   try {
-    // Test koneksi database
     await sequelize.authenticate();
     console.log('✅ Database Connected');
-
-    // JANGAN sync kalau database sudah di-import
-    // await sequelize.sync();
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
-
   } catch (error) {
     console.error('❌ Database Error:', error);
     process.exit(1);
